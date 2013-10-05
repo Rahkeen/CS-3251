@@ -98,8 +98,7 @@ int FileInfoEqualChecksum(FileInfo *a, FileInfo *b){
 }
 
 
-DirectoryInfo *DirectoryInfoMinus(DirectoryInfo *a, DirectoryInfo *b) {
-    
+DirectoryInfo *DirectoryInfoMinus(DirectoryInfo *a, DirectoryInfo *b) {  
     FileInfo *fileA, *fileB;
     FileInfo *buff;
     int isIn;
@@ -143,6 +142,8 @@ void printDirectoryInfo(DirectoryInfo *di){
 }
 
 
+
+/*
 int main() {
     DirectoryInfo dirInfo, current, parent;
     listDirectory(&current, ".");
@@ -163,6 +164,5 @@ int main() {
     free(pt);
     freeDirectoryInfo(&current);
     freeDirectoryInfo(&parent);
-    
-    
 }
+*/

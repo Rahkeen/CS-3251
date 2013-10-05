@@ -2,13 +2,30 @@
 *
 * FILE:		server.c
 * AUTHOR:   Stephen Pardue	
-* PROJECT:	CS 3251 Project 1 - Professor Traynor
+* PROJECT:	CS 3251 Project 2 - Professor Traynor
 * DESCRIPTION:	Network Server Code
 *
 *////////////////////////////////////////////////////////////
 
 #include "sync.h"
 
+
+int handle_list(int clientSock){
+    printf("what is up!\n");
+    return 0;
+}
+
+int handle_diff(int clientSock){
+    return 0;
+}
+
+int handle_pull(int clientSock){
+    return 0;
+}
+
+int handle_exit(int clientSock) {
+    return 0;
+}
 
 
 void *handleClient(void *clientSocket) {
@@ -24,25 +41,30 @@ void *handleClient(void *clientSocket) {
             exit(1);
         }
 
-       
-
-        if (buff == 'x') {
-            toSend = 's';
-        } else {
-            toSend = buff;
+        switch(buff) {
+            case 'L':
+                handle_list(clientSock);
+                break;
+            case 'D':
+                handle_diff(clientSock);
+                break;
+            case 'P':
+                handle_pull(clientSock);
+                break;
+            case 'E':
+                handle_exit(clientSock);
+                break;
         }
+
+        toSend = 'a';
+
         
 
         /* Return md_value to client */
         //printf("md_len: %d, %s, %s\n", md_len, md_value, nameBuf);
         if (send(clientSock, &toSend, sizeof(char), 0) < 0){
             break;
-
         }
-        if (toSend == 's') {
-            break;
-        }
-        printf("%c", toSend);
         
     }
     close(clientSock);
@@ -60,14 +82,9 @@ int main(int argc, char *argv[])
     //int clientSock;				/* Client Socket */
     struct sockaddr_in changeServAddr;		/* Local address */
     struct sockaddr_in changeClntAddr;		/* Client address */
-    unsigned short changeServPort = 1337;		/* Server port */
+    unsigned short changeServPort = SERVER_PORT;		/* Server port */
     unsigned int clntLen = sizeof(changeServAddr);			/* Length of address data struct */
 
-    char nameBuf[BUFSIZE];			/* Buff to store name from client */
-    unsigned char md_value[EVP_MAX_MD_SIZE];	/* Buff to store change result */
-    EVP_MD_CTX *mdctx;				/* Digest data structure declaration */
-    const EVP_MD *md;				/* Digest data structure declaration */
-    int md_len;					/* Digest data structure size tracking */
 
 
     /* Create new TCP Socket for incoming requests*/
@@ -95,6 +112,7 @@ int main(int argc, char *argv[])
     }
 
     /* Listen for incoming connections */
+    printf("Listening for incoming connections.\n");
     if (listen(serverSock, MAXPENDING) < 0) {
         fprintf(stderr, "listen() failed\n");
         exit(1);
@@ -115,11 +133,8 @@ int main(int argc, char *argv[])
             //exit(1);
         }
         pthread_t pth;
+        printf("Handling a new client.\n");
         pthread_create((pthread_t *) malloc(sizeof(pthread_t)), NULL, handleClient,clientSock);
- 
-
-
-        
     }
 }
 

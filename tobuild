@@ -1,0 +1,1 @@
+gcc -lssl -lcrypt listdir.c listdir.h -o hi.exe

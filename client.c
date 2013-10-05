@@ -7,23 +7,7 @@
 *
 *////////////////////////////////////////////////////////////
 
-/* Included libraries */
-
-#include <stdio.h>		    /* for printf() and fprintf() */
-#include <sys/socket.h>		    /* for socket(), connect(), send(), and recv() */
-#include <arpa/inet.h>		    /* for sockaddr_in and inet_addr() */
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <openssl/evp.h>	    /* for OpenSSL EVP digest libraries/SHA256 */
-
-/* Constants */
-#define RCVBUFSIZE 512		    /* The receive buffer size */
-#define SNDBUFSIZE 512		    /* The send buffer size */
-#define MDLEN 32
-
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 1337
+#include "sync.h"
 
 /* The main function */
 int main(int argc, char *argv[])
@@ -42,8 +26,8 @@ int main(int argc, char *argv[])
     /* Get the Student Name from the command line */
     if (argc != 2) 
     {
-	printf("Incorrect input format. The correct format is:\n\tnameChanger your_name\n");
-	exit(1);
+	    printf("Incorrect input format. The correct format is:\n\tnameChanger your_name\n");
+	    exit(1);
     }
     studentName = argv[1];
     memset(&sndBuf, 0, RCVBUFSIZE);
@@ -73,27 +57,34 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+
+
+
+    char buff;
+    char input;
     
-    /* Send the string to the server */
-    ssize_t numBytes = send(clientSock, sndBuf, strlen(sndBuf), 0);
-    if (numBytes < 0) {
-        fprintf(stderr, "send() failed bro\n");
-        exit(1);
-    }
-
+    while(1){
         
+        input = getc(stdin);
+        ssize_t numBytes = send(clientSock, &input, sizeof(char), 0);
+        if (numBytes < 0) {
+            fprintf(stderr, "send() failed bro\n");
+            exit(1);
+        }
 
-    memset(rcvBuf, 0, RCVBUFSIZE);
-    /* Receive and print response from the server */
-    if (recv(clientSock, rcvBuf, RCVBUFSIZE-1, 0) < 0){
-        fprintf(stderr, "could not recieve data :(\n");
-        exit(1);
+            
+
+        memset(rcvBuf, 0, RCVBUFSIZE);
+        /* Receive and print response from the server */
+        if (recv(clientSock, &buff, sizeof(char), 0) < 0){
+            fprintf(stderr, "could not recieve data :(\n");
+            exit(1);
+        }
+        if (buff == 's'){
+            break;
+        }
     }
 
-    //printf("%s\n", studentName);
-    printf("Transformed input is: ");
-    for(i = 0; i < MDLEN; i++) printf("%02x", (unsigned char) rcvBuf[i]);
-    printf("\n");
 
     return 0;
 }

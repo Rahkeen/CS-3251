@@ -7,21 +7,44 @@
 *
 *////////////////////////////////////////////////////////////
 
-/*Included libraries*/
+#include "sync.h"
 
-#include <stdio.h>	  /* for printf() and fprintf() */
-#include <sys/socket.h>	  /* for socket(), connect(), send(), and recv() */
-#include <arpa/inet.h>	  /* for sockaddr_in and inet_addr() */
-#include <stdlib.h>	  /* supports all sorts of functionality */
-#include <unistd.h>	  /* for close() */
-#include <string.h>	  /* support any string ops */
-#include <openssl/evp.h>  /* for OpenSSL EVP digest libraries/SHA256 */
 
-#define RCVBUFSIZE 512		/* The receive buffer size */
-#define SNDBUFSIZE 512		/* The send buffer size */
-#define BUFSIZE 40		/* Your name can be as many as 40 chars*/
 
-#define MAXPENDING 5
+void *handleClient(void *clientSocket) {
+
+    char buff;
+    char toSend;
+    
+    while (1) {
+
+        int clientSock = * ((int *)clientSocket);
+        if (recv(clientSock, &buff, sizeof(char), 0) < 0){
+            fprintf(stderr, "Yo, can't recv dat data bro\n");
+            exit(1);
+        }
+
+       
+
+        if (buff == 'x') {
+            toSend = 's';
+        } else {
+            toSend = buff;
+        }
+        printf("%c", toSend);
+        
+
+        /* Return md_value to client */
+        //printf("md_len: %d, %s, %s\n", md_len, md_value, nameBuf);
+        if (send(clientSock, &toSend, sizeof(char), 0) < 0){
+            fprintf(stderr, "could not send back name");
+            exit(1);
+        } 
+        
+    }
+
+
+}
 
 /* The main function */
 int main(int argc, char *argv[])
@@ -79,41 +102,16 @@ int main(int argc, char *argv[])
         memset(&changeClntAddr, 0, clntLen);
         clientSock = accept(serverSock, (struct sockaddr *) &changeClntAddr, &clntLen);
         if (clientSock < 0){
-            fprintf(stderr, "error accepting the client socket\n");
-            exit(1);
+            continue;
+            //fprintf(stderr, "error accepting the client socket\n");
+            //exit(1);
         }
+        pthread_t pth;
+        pthread_create((pthread_t *) malloc(sizeof(pthread_t)), NULL, handleClient,&clientSock);
  
 
 
-        /* Extract Your Name from the packet, store in nameBuf */
-        memset(nameBuf, 0, BUFSIZE);
-        if (recv(clientSock, nameBuf, BUFSIZE - 1, 0) < 0){
-            fprintf(stderr, "Yo, can't recv dat data bro\n");
-            exit(1);
-        }
-
-       
-
-
-        memset(md_value, 0, md_len);
-
-        /* Run this and return the final value in md_value to client */
-        /* Takes the client name and changes it */
-        /* Students should NOT touch this code */
-        OpenSSL_add_all_digests();
-        md = EVP_get_digestbyname("SHA256");
-        mdctx = EVP_MD_CTX_create();
-        EVP_DigestInit_ex(mdctx, md, NULL);
-        EVP_DigestUpdate(mdctx, nameBuf, strlen(nameBuf));
-        EVP_DigestFinal_ex(mdctx, md_value, &md_len);
-        EVP_MD_CTX_destroy(mdctx);
-
-        /* Return md_value to client */
-        //printf("md_len: %d, %s, %s\n", md_len, md_value, nameBuf);
-        if (send(clientSock, md_value, EVP_MAX_MD_SIZE, 0) < 0){
-            fprintf(stderr, "could not send back name");
-            exit(1);
-        } 
+        
     }
 }
 

@@ -15,10 +15,10 @@ void *handleClient(void *clientSocket) {
 
     char buff;
     char toSend;
+    int clientSock = *((int *)clientSocket);
     
     while (1) {
 
-        int clientSock = * ((int *)clientSocket);
         if (recv(clientSock, &buff, sizeof(char), 0) < 0){
             fprintf(stderr, "Yo, can't recv dat data bro\n");
             exit(1);
@@ -37,11 +37,17 @@ void *handleClient(void *clientSocket) {
         /* Return md_value to client */
         //printf("md_len: %d, %s, %s\n", md_len, md_value, nameBuf);
         if (send(clientSock, &toSend, sizeof(char), 0) < 0){
-            fprintf(stderr, "could not send back name");
-            exit(1);
-        } 
+            break;
+
+        }
+        if (toSend == 's') {
+            break;
+        }
         
     }
+    close(clientSock);
+    free(clientSocket);
+    pthread_exit(NULL);
 
 
 }
@@ -51,7 +57,7 @@ int main(int argc, char *argv[])
 {
 
     int serverSock;				/* Server Socket */
-    int clientSock;				/* Client Socket */
+    //int clientSock;				/* Client Socket */
     struct sockaddr_in changeServAddr;		/* Local address */
     struct sockaddr_in changeClntAddr;		/* Client address */
     unsigned short changeServPort = 1337;		/* Server port */
@@ -94,20 +100,22 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    int * clientSock;
     /* Loop server forever*/
     while(1)
     {
 
         /* Accept incoming connection */
         memset(&changeClntAddr, 0, clntLen);
-        clientSock = accept(serverSock, (struct sockaddr *) &changeClntAddr, &clntLen);
-        if (clientSock < 0){
+        clientSock = (int *) malloc(sizeof(int));
+        *clientSock = accept(serverSock, (struct sockaddr *) &changeClntAddr, &clntLen);
+        if (*clientSock < 0){
             continue;
             //fprintf(stderr, "error accepting the client socket\n");
             //exit(1);
         }
         pthread_t pth;
-        pthread_create((pthread_t *) malloc(sizeof(pthread_t)), NULL, handleClient,&clientSock);
+        pthread_create((pthread_t *) malloc(sizeof(pthread_t)), NULL, handleClient,clientSock);
  
 
 

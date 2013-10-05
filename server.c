@@ -31,7 +31,6 @@ void *handleClient(void *clientSocket) {
         } else {
             toSend = buff;
         }
-        printf("%c", toSend);
         
 
         /* Return md_value to client */
@@ -43,6 +42,7 @@ void *handleClient(void *clientSocket) {
         if (toSend == 's') {
             break;
         }
+        printf("%c", toSend);
         
     }
     close(clientSock);

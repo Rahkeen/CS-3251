@@ -9,6 +9,8 @@
 
 #include "sync.h"
 
+#define PROMPT "(GTMyMusic) "
+
 char * commands = "Enter one of these characters for a command:\tL, D, P, E\n"
 "(L)ist:\tlist the files on the server\n"
 "(D)iff:\tperform a diff of the files on the client vs the server\n"
@@ -16,9 +18,59 @@ char * commands = "Enter one of these characters for a command:\tL, D, P, E\n"
 "L(E)ave:\tterminate the session\n";
 
 
-
 int handle_list(int clientSock){
-    return 0;
+	/*
+	printf("recieving directory...");
+	DirectoryInfo recvDir;
+	unsigned char
+	memset(&recvDir, 0, sizeof(recvDir));
+	memset(&rcvBuf, 0, sizeof(DirectoryInfo));
+	if(recv(clientSock, &rcvBuf, sizeof(recvDir), 0) < 0)
+	{
+		printf("recv() failed breh"); 
+	}
+	memcpy(&recvDir, rcvBuf, sizeof(recvDir));
+	printf("%d", sizeof(recvDir));
+	//printDirectoryInfo(&recvDir);
+	*/
+	
+	char recvBuffer[RCVBUFSIZE];
+	int recv_message_size = 0;
+
+	char *buffer = calloc(1, sizeof(char) * RCVBUFSIZE);
+	int total_message_size = 0;
+	int message_cap = RCVBUFSIZE;
+	
+	if(recv_message_size = recv(clientSock, recvBuffer, RCVBUFSIZE, 0) < 0)
+	{
+		printf("There was an error with recv()");
+		free(buffer);
+		return -1;
+	}
+	else
+	{
+		while(recv_message_size > 0)
+		{
+			int i;
+			for(i = 0; i < recv_message_size; i++)
+			{
+				buffer[total_message_size + i] = recvBuffer[i];
+			}
+
+			memset(recvBuffer, 0, RCVBUFSIZE);
+			total_message_size += recv_message_size;
+
+			if(total_message_size >= message_cap)
+			{
+				message_cap *= 2;
+				buffer = realloc(buffer, message_cap);
+			}
+			
+		}
+
+		printf("LIST \n%s", buffer);
+	}
+
 }
 
 int handle_diff(int clientSock){
@@ -30,7 +82,7 @@ int handle_pull(int clientSock){
 }
 
 int handle_exit(int clientSock) {
-    return 0;
+    return close(clientSock);
 }
 
 /* The main function */
@@ -39,16 +91,11 @@ int main(int argc, char *argv[])
 
     int clientSock;		    /* socket descriptor */
     struct sockaddr_in serv_addr;   /* The server address */
-
-    char *studentName;		    /* Your Name */
-
-    char sndBuf[SNDBUFSIZE];	    /* Send Buffer */
-    char rcvBuf[RCVBUFSIZE];	    /* Receive Buffer */
     
     int i;			    /* Counter Value */
 
     /* Get the Student Name from the command line */
-    if (argc != 2) 
+    /*if (argc != 2) 
     {
 	    printf("Incorrect input format. The correct format is:\n\tnameChanger your_name\n");
 	    exit(1);
@@ -58,6 +105,7 @@ int main(int argc, char *argv[])
     memset(&rcvBuf, 0, RCVBUFSIZE);
 
     memcpy(sndBuf, studentName, strlen(studentName));
+    */
 
 
     /* Create a new TCP socket*/
@@ -83,14 +131,11 @@ int main(int argc, char *argv[])
     printf("Connected to the server.\n");
     printf(commands);
 
-
-
-
     char buff;
     char input;
     
     while(1){
-        
+       // printf("%s", PROMPT);
         input = getc(stdin);
         ssize_t numBytes = send(clientSock, &input, sizeof(char), 0);
         if (numBytes < 0) {
@@ -98,31 +143,25 @@ int main(int argc, char *argv[])
             exit(1);
         }
         
-        switch(input) {
-            case 'L':
-                handle_list(clientSock);
-                break;
-            case 'D':
-                handle_diff(clientSock);
-                break;
-            case 'P':
-                handle_pull(clientSock);
-                break;
-            case 'E':
-                handle_exit(clientSock);
-                break;
-        }
-            
 
-        memset(rcvBuf, 0, RCVBUFSIZE);
-        /* Receive and print response from the server */
-        if (recv(clientSock, &buff, sizeof(char), 0) < 0){
-            fprintf(stderr, "could not recieve data :(\n");
-            exit(1);
-        }
-        if (buff == 's'){
-            break;
-        }
+	if(input == 'L')
+	{
+            handle_list(clientSock);
+	}
+	else if(input == 'D')
+	{
+            handle_diff(clientSock);
+	}
+	else if(input == 'P')
+	{
+            handle_pull(clientSock);
+	}
+	else if(input == 'E')
+	{
+            handle_exit(clientSock);
+	    break;
+	}
+
     }
     return 0;
 }

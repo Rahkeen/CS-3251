@@ -56,6 +56,7 @@ int listDirectory(DirectoryInfo *dirInfo, char *dirName){
     struct dirent *dir;
     
     LIST_INIT(&dirInfo->head);
+    dirInfo->length = 0;
 
     printf(dirName);
     d = opendir(dirName);
@@ -74,6 +75,7 @@ int listDirectory(DirectoryInfo *dirInfo, char *dirName){
     } else {
         return -1;
     }
+    chdir("..");
 }
 
 void freeDirectoryInfo(DirectoryInfo *dirInfo) {

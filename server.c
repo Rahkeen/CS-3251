@@ -9,47 +9,29 @@
 
 #include "sync.h"
 
-int handle_list(int clientSock){
-	/*
+
+
+void sendDirectoryInfo(int clientSock) {
 	DirectoryInfo dInfo;
-	memset(&dInfo, 0, sizeof(dInfo));
-	listDirectory(&dInfo, "./theProject");
-	ssize_t numBytes = send(clientSock, &dInfo, sizeof(dInfo), 0);
-	if(numBytes < 0)
-	{
-		printf("Failed to send()");
-		return -1;
-	}
->>>>>>> bb6c6392912b3d5e4ca79c7e344e7615168f4e91
-    return 0;
-	*/
-	
-
-	printf("Hi there buddy");
-	DirectoryInfo *dInfo;
 	FileInfo *file;
-	char* file_message;
-	memset(dInfo, 0, sizeof(DirectoryInfo));
-	listDirectory(dInfo, "./theProject");     // populates the dInfo struct
+	int i;
+	memset(&dInfo, 0, sizeof(DirectoryInfo));
+	listDirectory(&dInfo, "./theProject");     // populates the dInfo struct
 
-	
-	if(dInfo->length == 0)
-	{
-		file_message = "No Files In Directory\n";
-		send(clientSock, file_message, strlen(file_message), 0);
-		return 0;
-	}
+    
+    
+    //send the lenght of the dirInfo
+    send(clientSock, &dInfo.length, sizeof(int), 0);
+    printDirectoryInfo(&dInfo);
+    LIST_FOREACH(file, &(dInfo.head), FileInfoEntry){
+        send(clientSock, file, sizeof(FileInfo), 0);
+    }
+}
 
-	LIST_FOREACH(file, &(dInfo->head), FileInfoEntry)
-	{
-		if(asprintf(&file_message, "%s\n", file->name) < 0)
-		{
-			printf("Something went wrong with populating the file names\n");
-		}
-	}
 
-	printf("Sending the List!");
-	send(clientSock, file_message, strlen(file_message), 0);
+int handle_list(int clientSock){
+    sendDirectoryInfo(clientSock);
+	return 0;
 	
 }
 

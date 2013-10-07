@@ -18,6 +18,30 @@ char * commands = "Enter one of these characters for a command:\tL, D, P, E\n"
 "L(E)ave:\tterminate the session\n";
 
 
+
+DirectoryInfo *recvDirectoryInfo(int clientSock){
+    int i;
+	int len;
+	DirectoryInfo *recDir = calloc(1, sizeof(DirectoryInfo));
+	FileInfo *liBuff;
+	
+	memset(&len, 0, sizeof(len));
+	//recv the length
+	recv(clientSock, &len, sizeof(int), 0);
+	
+	recDir->length = len;
+	
+	//recv the list
+	for (i = 0; i < len; i++) {
+	    liBuff = calloc(1, sizeof(FileInfo));
+	    recv(clientSock, liBuff, sizeof(FileInfo), 0);
+	    LIST_INSERT_HEAD(&recDir->head, liBuff, FileInfoEntry);
+	    //printf("%s, %s\n", liBuff.name, liBuff.checksum);
+	}
+	
+	return recDir;
+}
+
 int handle_list(int clientSock){
 	/*
 	printf("recieving directory...");
@@ -34,6 +58,12 @@ int handle_list(int clientSock){
 	//printDirectoryInfo(&recvDir);
 	*/
 	
+	DirectoryInfo *dInfo = recvDirectoryInfo(clientSock);
+	printDirectoryInfo(dInfo);
+	freeDirectoryInfo(dInfo);
+	free(dInfo);
+	
+	/*
 	char recvBuffer[RCVBUFSIZE];
 	int recv_message_size = 0;
 
@@ -70,6 +100,7 @@ int handle_list(int clientSock){
 
 		printf("LIST \n%s", buffer);
 	}
+	*/
 
 }
 

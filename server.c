@@ -11,7 +11,16 @@
 
 
 int handle_list(int clientSock){
-    printf("what is up!\n");
+    
+    DirectoryInfo di;
+    FileInfo *file;
+    listDirectory(&di, ".");
+    
+    FOREACH(file, 
+    
+    
+    
+    freeDirectoryInfo(&pt)
     return 0;
 }
 

@@ -146,7 +146,7 @@ void printDirectoryInfo(DirectoryInfo *di){
 /*
 int main() {
     DirectoryInfo dirInfo, current, parent;
-    listDirectory(&current, ".");
+    listDirectory(&current, "./theProject");
     listDirectory(&parent, "..");
     
     int n;
@@ -164,5 +164,5 @@ int main() {
     free(pt);
     freeDirectoryInfo(&current);
     freeDirectoryInfo(&parent);
-}
-*/
+}*/
+

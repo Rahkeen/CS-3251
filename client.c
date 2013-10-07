@@ -10,6 +10,7 @@
 #include "sync.h"
 
 #define PROMPT "(GTMyMusic) "
+#define CLIENT_DIR "./clientFiles"
 
 char * commands = "Enter one of these characters for a command:\tL, D, P, E\n"
 "(L)ist:\tlist the files on the server\n"
@@ -40,6 +41,22 @@ DirectoryInfo *recvDirectoryInfo(int clientSock){
 	}
 	
 	return recDir;
+}
+
+DirectoryInfo *getDiffDirectoryInfo(int clientSock) {
+	DirectoryInfo *serverDir = recvDirectoryInfo(clientSock);
+	DirectoryInfo *clientDir = calloc(1, sizeof(DirectoryInfo));
+	DirectoryInfo *diffDir;
+	
+
+	if(listDirectory(clientDir, CLIENT_DIR) < 0)
+	{
+		printf("Error in initializing the DirectoryInfo Struct");
+		return NULL;		
+	}
+
+	diffDir = DirectoryInfoMinus(serverDir, clientDir);
+	return diffDir;
 }
 
 int handle_list(int clientSock){
@@ -105,7 +122,10 @@ int handle_list(int clientSock){
 }
 
 int handle_diff(int clientSock){
-    return 0;
+	DirectoryInfo *diffDir = getDiffDirectoryInfo(clientSock);
+	printDirectoryInfo(diffDir);
+	freeDirectoryInfo(diffDir);
+	free(diffDir);
 }
 
 int handle_pull(int clientSock){

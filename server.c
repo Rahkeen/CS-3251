@@ -9,8 +9,6 @@
 
 #include "sync.h"
 
-
-
 void sendDirectoryInfo(int clientSock) {
 	DirectoryInfo dInfo;
 	FileInfo *file;
@@ -36,7 +34,7 @@ int handle_list(int clientSock){
 }
 
 int handle_diff(int clientSock){
-    return 0;
+    sendDirectoryInfo(clientSock);
 }
 
 int handle_pull(int clientSock){
@@ -75,17 +73,7 @@ void *handleClient(void *clientSocket) {
                 handle_exit(clientSock);
                 break;
         }
-
-       //toSend = 'a';
-
-        
-
-        /* Return md_value to client */
-        //printf("md_len: %d, %s, %s\n", md_len, md_value, nameBuf);
-        //if (send(clientSock, &toSend, sizeof(char), 0) < 0){
-        //    break;
-        //}
-        
+       
     }
     close(clientSock);
     free(clientSocket);

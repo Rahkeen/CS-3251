@@ -18,6 +18,8 @@
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 1337
 
+#define CLIENT_DIR "./clientFiles"
+#define SERVER_DIR "./theProject"
 
 #define MAXPENDING 5
 #define BUFSIZE 25

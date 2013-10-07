@@ -149,7 +149,7 @@ void printDirectoryInfo(DirectoryInfo *di){
 int main() {
     DirectoryInfo dirInfo, current, parent;
     listDirectory(&current, "./theProject");
-    listDirectory(&parent, "..");
+    listDirectory(&parent, "./clientFiles");
     
     int n;
     FileInfo *file;

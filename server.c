@@ -78,7 +78,7 @@ int handle_exit(int clientSock) {
 
 void *handleClient(SockAndAddr *sa) {
 
-    char buff;
+    char buff; 
     char toSend;
     int clientSock = sa->clientSock; // *((int *)clientSocket);
 	struct sockaddr_in clientAddr = sa->clientAddr;

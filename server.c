@@ -27,14 +27,16 @@ void sendDirectoryInfo(int clientSock) {
 }
 
 
-int handle_list(int clientSock){
+int handle_list(int clientSock, struct sockaddr_in clientAddr){
+	printf("Sending List to: %s\n", inet_ntoa(clientAddr.sin_addr));
     sendDirectoryInfo(clientSock);
 	return 0;
 	
 }
 
-int handle_diff(int clientSock){
+int handle_diff(int clientSock, struct sockaddr_in clientAddr){
     sendDirectoryInfo(clientSock);
+	return 0;
 }
 
 int handle_pull(int clientSock){
@@ -46,11 +48,14 @@ int handle_exit(int clientSock) {
 }
 
 
-void *handleClient(void *clientSocket) {
+void *handleClient(SockAndAddr *sa) {
 
     char buff;
     char toSend;
-    int clientSock = *((int *)clientSocket);
+    int clientSock = sa->clientSock; // *((int *)clientSocket);
+	struct sockaddr_in clientAddr = sa->clientAddr;
+
+	printf("Request from %s: ", inet_ntoa(clientAddr.sin_addr));
     
     while (1) {
 
@@ -61,10 +66,10 @@ void *handleClient(void *clientSocket) {
 
         switch(buff) {
             case 'L':
-                handle_list(clientSock);
+                handle_list(clientSock, clientAddr);
                 break;
             case 'D':
-                handle_diff(clientSock);
+                handle_diff(clientSock, clientAddr);
                 break;
             case 'P':
                 handle_pull(clientSock);
@@ -76,7 +81,7 @@ void *handleClient(void *clientSocket) {
        
     }
     close(clientSock);
-    free(clientSocket);
+    free(clientSock);
     pthread_exit(NULL);
 
 
@@ -140,9 +145,12 @@ int main(int argc, char *argv[])
             //fprintf(stderr, "error accepting the client socket\n");
             //exit(1);
         }
+		SockAndAddr *tuple = (SockAndAddr *) malloc(sizeof(SockAndAddr));
+		tuple->clientAddr = changeClntAddr;
+		tuple->clientSock = *clientSock;
         pthread_t pth;
         printf("Handling a new client.\n");
-        pthread_create((pthread_t *) malloc(sizeof(pthread_t)), NULL, handleClient,clientSock);
+        pthread_create((pthread_t *) malloc(sizeof(pthread_t)), NULL, handleClient,tuple);
     }
 }
 

@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 
     int * clientSock;
 	FILE *fp;
-	fp = fopen(LOG_FILE, "w");
+	fp = fopen(LOG_FILE, "a");
 	fprintf(fp, "SERVER LOGS\n");
 	fclose(fp);
     /* Loop server forever*/

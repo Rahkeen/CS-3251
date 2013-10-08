@@ -41,13 +41,22 @@ int handle_list(int clientSock, struct sockaddr_in clientAddr){
 
 int handle_diff(int clientSock, struct sockaddr_in clientAddr){
 	printf("Sending Diff to: %s\n", inet_ntoa(clientAddr.sin_addr));
+	FILE *fp = fopen(LOG_FILE, "a");
+	fprintf(fp, "Sending Diff to: %s\n", inet_ntoa(clientAddr.sin_addr));
+	fclose(fp);
+
     sendDirectoryInfo(clientSock);
     return 0;
 }
 
 int handle_pull(int clientSock){
+	printf("Sending Files to: %s\n", inet_ntoa(clientAddr.sin_addr));
     DirectoryInfo *diffDir;
     FileInfo *file;
+
+	FILE *fp = fopen(LOG_FILE, "a");
+	fprintf(fp, "Sending Files to: %s\n", inet_ntoa(clientAddr.sin_addr));
+	fclose(fp);
     
     sendDirectoryInfo(clientSock);
     diffDir = recvDirectoryInfo(clientSock);

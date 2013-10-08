@@ -35,6 +35,7 @@ int handle_list(int clientSock, struct sockaddr_in clientAddr){
 }
 
 int handle_diff(int clientSock, struct sockaddr_in clientAddr){
+	printf("Sending Diff to: %s\n", inet_ntoa(clientAddr.sin_addr));
     sendDirectoryInfo(clientSock);
     return 0;
 }
@@ -55,7 +56,7 @@ void *handleClient(SockAndAddr *sa) {
     int clientSock = sa->clientSock; // *((int *)clientSocket);
 	struct sockaddr_in clientAddr = sa->clientAddr;
 
-	printf("Request from %s: ", inet_ntoa(clientAddr.sin_addr));
+	printf("Request from %s\n: ", inet_ntoa(clientAddr.sin_addr));
     
     while (1) {
 

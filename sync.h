@@ -16,8 +16,8 @@
 #include "netfileio.h"
 
 /* Constants */
-#define RCVBUFSIZE 512		    /* The receive buffer size */
-#define SNDBUFSIZE 512		    /* The send buffer size */
+#define RCVBUFSIZE 1		    /* The receive buffer size */
+#define SNDBUFSIZE 1		    /* The send buffer size */
 #define MDLEN 32
 
 #define SERVER_IP "127.0.0.1"

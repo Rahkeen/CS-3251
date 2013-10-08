@@ -53,15 +53,18 @@ int handle_pull(int clientSock){
     FileInfo *file;
     int i;
 
+    send(clientSock, &(diffDir->length), sizeof(int), 0);
     if (diffDir->length > 0) {
-        send(clientSock, &(diffDir->length), sizeof(int), 0);
         LIST_FOREACH(file, &(diffDir->head), FileInfoEntry){
             send(clientSock, file, sizeof(FileInfo), 0);
+            printf("Getting file: %s\n", file->name);
         }
         
         for (i = 0; i < diffDir->length; i++){
             recvFile(clientSock, CLIENT_DIR);
         }
+     } else {
+        printf("No files to sync!\n");
      }
     
     
@@ -112,7 +115,9 @@ int main(int argc, char *argv[])
     char input;
     
     while(1){
+        printf("Enter L, D, P, or E: ");
         input = getc(stdin);
+        getc(stdin); //for the newline character
         ssize_t numBytes = send(clientSock, &input, sizeof(char), 0);
         if (numBytes < 0) {
             fprintf(stderr, "send() failed\n");
@@ -135,10 +140,12 @@ int main(int argc, char *argv[])
 		else if(input == 'E')
 		{
 		    handle_exit(clientSock);
+		    break;
 		}
+		printf("\n");
 
     }
-
+    printf("Bye Bye\n");
     return 0;
 }
 

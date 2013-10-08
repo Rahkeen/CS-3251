@@ -57,13 +57,16 @@ int handle_pull(int clientSock, struct sockaddr_in clientAddr){
 	FILE *fp = fopen(LOG_FILE, "a");
 	fprintf(fp, "Sending Files to: %s\n", inet_ntoa(clientAddr.sin_addr));
 	fclose(fp);
-    
+	
     sendDirectoryInfo(clientSock);
     diffDir = recvDirectoryInfo(clientSock);
     
-    chdir(SERVER_DIR);
-    LIST_FOREACH(file, &(diffDir->head), FileInfoEntry){
-        sendFile(clientSock, SERVER_DIR, file);
+    if (diffDir->length > 0){
+        LIST_FOREACH(file, &(diffDir->head), FileInfoEntry){
+            sendFile(clientSock, SERVER_DIR, file);
+        }
+    } else {
+        printf("No files to sync!\n");
     }
     
     freeDirectoryInfo(diffDir);
@@ -72,6 +75,7 @@ int handle_pull(int clientSock, struct sockaddr_in clientAddr){
 }
 
 int handle_exit(int clientSock) {
+    printf("Client terminated the connection.\n");
     return 0;
 }
 
@@ -100,20 +104,20 @@ void *handleClient(SockAndAddr *sa) {
                 handle_diff(clientSock, clientAddr);
                 break;
             case 'P':
-                printf("yo bitche\n");
                 handle_pull(clientSock, clientAddr);
                 break;
             case 'E':
                 handle_exit(clientSock);
                 break;
         }
+        if (buff == 'E') {
+            break;
+        }
        
     }
     close(clientSock);
-    free(clientSock);
+    free(sa); //i guess?
     pthread_exit(NULL);
-
-
 }
 
 /* The main function */

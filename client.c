@@ -1,7 +1,7 @@
 /*///////////////////////////////////////////////////////////
 *
 * FILE:		client.c
-* AUTHOR:	Stephen Pardue	
+* AUTHOR:	Stephen Pardue, Rikin Marfatia	
 * PROJECT:	CS 3251 Project 2 - Professor Traynor
 * DESCRIPTION:	Network Client Code
 *
@@ -14,29 +14,6 @@ char * commands = "Enter one of these characters for a command:\tL, D, P, E\n"
 "(D)iff:\tperform a diff of the files on the client vs the server\n"
 "(P)ull:\tget files from the server that this client doesn't have\n"
 "L(E)ave:\tterminate the session\n";
-
-DirectoryInfo *recvDirectoryInfo(int clientSock){
-    int i;
-	int len;
-	DirectoryInfo *recDir = calloc(1, sizeof(DirectoryInfo));
-	FileInfo *liBuff;
-	
-	memset(&len, 0, sizeof(len));
-	//recv the length
-	recv(clientSock, &len, sizeof(int), 0);
-	
-	recDir->length = len;
-	
-	//recv the list
-	for (i = 0; i < len; i++) {
-	    liBuff = calloc(1, sizeof(FileInfo));
-	    recv(clientSock, liBuff, sizeof(FileInfo), 0);
-	    LIST_INSERT_HEAD(&recDir->head, liBuff, FileInfoEntry);
-	    //printf("%s, %s\n", liBuff.name, liBuff.checksum);
-	}
-	
-	return recDir;
-}
 
 DirectoryInfo *getDiffDirectoryInfo(int clientSock) {
 	DirectoryInfo *serverDir = recvDirectoryInfo(clientSock);
@@ -72,6 +49,25 @@ int handle_diff(int clientSock){
 }
 
 int handle_pull(int clientSock){
+    DirectoryInfo *diffDir = getDiffDirectoryInfo(clientSock);
+    FileInfo *file;
+    int i;
+
+    if (diffDir->length > 0) {
+        send(clientSock, &(diffDir->length), sizeof(int), 0);
+        LIST_FOREACH(file, &(diffDir->head), FileInfoEntry){
+            send(clientSock, file, sizeof(FileInfo), 0);
+        }
+        
+        for (i = 0; i < diffDir->length; i++){
+            recvFile(clientSock, CLIENT_DIR);
+        }
+     }
+    
+    
+   
+    freeDirectoryInfo(diffDir);
+	free(diffDir);
     return 0;
 }
 
@@ -139,7 +135,6 @@ int main(int argc, char *argv[])
 		else if(input == 'E')
 		{
 		    handle_exit(clientSock);
-			break;
 		}
 
     }

@@ -8,7 +8,12 @@
 #include <openssl/evp.h>	    /* for OpenSSL EVP digest libraries/SHA256 */
 #include <pthread.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "listdir.h"
+#include "netfileio.h"
 
 /* Constants */
 #define RCVBUFSIZE 512		    /* The receive buffer size */

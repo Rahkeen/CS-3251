@@ -49,7 +49,7 @@ int handle_diff(int clientSock, struct sockaddr_in clientAddr){
     return 0;
 }
 
-int handle_pull(int clientSock){
+int handle_pull(int clientSock, struct sockaddr_in clientAddr){
 	printf("Sending Files to: %s\n", inet_ntoa(clientAddr.sin_addr));
     DirectoryInfo *diffDir;
     FileInfo *file;
@@ -101,7 +101,7 @@ void *handleClient(SockAndAddr *sa) {
                 break;
             case 'P':
                 printf("yo bitche\n");
-                handle_pull(clientSock);
+                handle_pull(clientSock, clientAddr);
                 break;
             case 'E':
                 handle_exit(clientSock);

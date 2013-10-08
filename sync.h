@@ -20,6 +20,7 @@
 
 #define CLIENT_DIR "./clientFiles"
 #define SERVER_DIR "./theProject"
+#define LOG_FILE "./LOG.txt"
 
 #define MAXPENDING 5
 #define BUFSIZE 25

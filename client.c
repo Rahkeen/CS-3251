@@ -9,16 +9,11 @@
 
 #include "sync.h"
 
-#define PROMPT "(GTMyMusic) "
-#define CLIENT_DIR "./clientFiles"
-
 char * commands = "Enter one of these characters for a command:\tL, D, P, E\n"
 "(L)ist:\tlist the files on the server\n"
 "(D)iff:\tperform a diff of the files on the client vs the server\n"
 "(P)ull:\tget files from the server that this client doesn't have\n"
 "L(E)ave:\tterminate the session\n";
-
-
 
 DirectoryInfo *recvDirectoryInfo(int clientSock){
     int i;
@@ -94,20 +89,6 @@ int main(int argc, char *argv[])
     
     int i;			    /* Counter Value */
 
-    /* Get the Student Name from the command line */
-    /*if (argc != 2) 
-    {
-	    printf("Incorrect input format. The correct format is:\n\tnameChanger your_name\n");
-	    exit(1);
-    }
-    studentName = argv[1];git
-    memset(&sndBuf, 0, RCVBUFSIZE);
-    memset(&rcvBuf, 0, RCVBUFSIZE);
-
-    memcpy(sndBuf, studentName, strlen(studentName));
-    */
-
-
     /* Create a new TCP socket*/
     clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (clientSock < 0) {
@@ -135,7 +116,6 @@ int main(int argc, char *argv[])
     char input;
     
     while(1){
-        //printf("%s", PROMPT);
         input = getc(stdin);
         ssize_t numBytes = send(clientSock, &input, sizeof(char), 0);
         if (numBytes < 0) {
@@ -163,6 +143,7 @@ int main(int argc, char *argv[])
 		}
 
     }
+
     return 0;
 }
 

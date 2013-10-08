@@ -135,11 +135,7 @@ void printDirectoryInfo(DirectoryInfo *di){
     int n;
     
     LIST_FOREACH(file, &(di->head), FileInfoEntry){
-        printf("%s, ", file->name);
-        for (n = 0; n < MD5_DIGEST_LENGTH; n++){
-            printf("%02x", (unsigned char) file->checksum[n]);
-        }
-        printf("\n");
+        printf("%s\n", file->name);
     }
 }
 

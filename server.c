@@ -14,13 +14,12 @@ void sendDirectoryInfo(int clientSock) {
 	FileInfo *file;
 	int i;
 	memset(&dInfo, 0, sizeof(DirectoryInfo));
-	listDirectory(&dInfo, "./theProject");     // populates the dInfo struct
+	listDirectory(&dInfo, SERVER_DIR);     // populates the dInfo struct
 
     
     
     //send the lenght of the dirInfo
     send(clientSock, &dInfo.length, sizeof(int), 0);
-    printDirectoryInfo(&dInfo);
     LIST_FOREACH(file, &(dInfo.head), FileInfoEntry){
         send(clientSock, file, sizeof(FileInfo), 0);
     }
@@ -29,6 +28,10 @@ void sendDirectoryInfo(int clientSock) {
 
 int handle_list(int clientSock, struct sockaddr_in clientAddr){
 	printf("Sending List to: %s\n", inet_ntoa(clientAddr.sin_addr));
+	FILE *fp = fopen(LOG_FILE, "a");
+	fprintf(fp, "Sending List to: %s\n", inet_ntoa(clientAddr.sin_addr));
+	fclose(fp);
+	
     sendDirectoryInfo(clientSock);
 	return 0;
 	
@@ -56,7 +59,7 @@ void *handleClient(SockAndAddr *sa) {
     int clientSock = sa->clientSock; // *((int *)clientSocket);
 	struct sockaddr_in clientAddr = sa->clientAddr;
 
-	printf("Request from %s\n: ", inet_ntoa(clientAddr.sin_addr));
+	printf("Request from: %s\n", inet_ntoa(clientAddr.sin_addr));
     
     while (1) {
 
@@ -111,8 +114,6 @@ int main(int argc, char *argv[])
     int on = 1;
     setsockopt(serverSock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
-   
-
     /* Construct local address structure*/
     memset(&changeServAddr, 0, clntLen);
     changeServAddr.sin_family = AF_INET;
@@ -133,6 +134,10 @@ int main(int argc, char *argv[])
     }
 
     int * clientSock;
+	FILE *fp;
+	fp = fopen(LOG_FILE, "w");
+	fprintf(fp, "SERVER LOGS\n");
+	fclose(fp);
     /* Loop server forever*/
     while(1)
     {

@@ -1,0 +1,2 @@
+SERVER LOGS
+Sending List to: 127.0.0.1

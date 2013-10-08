@@ -23,3 +23,8 @@
 
 #define MAXPENDING 5
 #define BUFSIZE 25
+
+typedef struct {
+	struct sockaddr_in clientAddr;
+	int clientSock;
+} SockAndAddr;

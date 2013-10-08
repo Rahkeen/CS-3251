@@ -60,69 +60,17 @@ DirectoryInfo *getDiffDirectoryInfo(int clientSock) {
 }
 
 int handle_list(int clientSock){
-	/*
-	printf("recieving directory...");
-	DirectoryInfo recvDir;
-	unsigned char
-	memset(&recvDir, 0, sizeof(recvDir));
-	memset(&rcvBuf, 0, sizeof(DirectoryInfo));
-	if(recv(clientSock, &rcvBuf, sizeof(recvDir), 0) < 0)
-	{
-		printf("recv() failed breh"); 
-	}
-	memcpy(&recvDir, rcvBuf, sizeof(recvDir));
-	printf("%d", sizeof(recvDir));
-	//printDirectoryInfo(&recvDir);
-	*/
 	
 	DirectoryInfo *dInfo = recvDirectoryInfo(clientSock);
+	printf("List of files on Server: \n");
 	printDirectoryInfo(dInfo);
 	freeDirectoryInfo(dInfo);
 	free(dInfo);
-	
-	/*
-	char recvBuffer[RCVBUFSIZE];
-	int recv_message_size = 0;
-
-	char *buffer = calloc(1, sizeof(char) * RCVBUFSIZE);
-	int total_message_size = 0;
-	int message_cap = RCVBUFSIZE;
-	
-	if(recv_message_size = recv(clientSock, recvBuffer, RCVBUFSIZE, 0) < 0)
-	{
-		printf("There was an error with recv()");
-		free(buffer);
-		return -1;
-	}
-	else
-	{
-		while(recv_message_size > 0)
-		{
-			int i;
-			for(i = 0; i < recv_message_size; i++)
-			{
-				buffer[total_message_size + i] = recvBuffer[i];
-			}
-
-			memset(recvBuffer, 0, RCVBUFSIZE);
-			total_message_size += recv_message_size;
-
-			if(total_message_size >= message_cap)
-			{
-				message_cap *= 2;
-				buffer = realloc(buffer, message_cap);
-			}
-			
-		}
-
-		printf("LIST \n%s", buffer);
-	}
-	*/
-
 }
 
 int handle_diff(int clientSock){
 	DirectoryInfo *diffDir = getDiffDirectoryInfo(clientSock);
+	printf("Files not owned locally: \n");
 	printDirectoryInfo(diffDir);
 	freeDirectoryInfo(diffDir);
 	free(diffDir);
@@ -133,6 +81,7 @@ int handle_pull(int clientSock){
 }
 
 int handle_exit(int clientSock) {
+	printf("Closing connection... \n");
     return close(clientSock);
 }
 
@@ -151,7 +100,7 @@ int main(int argc, char *argv[])
 	    printf("Incorrect input format. The correct format is:\n\tnameChanger your_name\n");
 	    exit(1);
     }
-    studentName = argv[1];
+    studentName = argv[1];git
     memset(&sndBuf, 0, RCVBUFSIZE);
     memset(&rcvBuf, 0, RCVBUFSIZE);
 
@@ -186,32 +135,32 @@ int main(int argc, char *argv[])
     char input;
     
     while(1){
-       // printf("%s", PROMPT);
+        //printf("%s", PROMPT);
         input = getc(stdin);
         ssize_t numBytes = send(clientSock, &input, sizeof(char), 0);
         if (numBytes < 0) {
-            fprintf(stderr, "send() failed bro\n");
+            fprintf(stderr, "send() failed\n");
             exit(1);
         }
         
 
-	if(input == 'L')
-	{
-            handle_list(clientSock);
-	}
-	else if(input == 'D')
-	{
-            handle_diff(clientSock);
-	}
-	else if(input == 'P')
-	{
-            handle_pull(clientSock);
-	}
-	else if(input == 'E')
-	{
-            handle_exit(clientSock);
-	    break;
-	}
+		if(input == 'L')
+		{
+		        handle_list(clientSock);
+		}
+		else if(input == 'D')
+		{
+		        handle_diff(clientSock);
+		}
+		else if(input == 'P')
+		{
+		        handle_pull(clientSock);
+		}
+		else if(input == 'E')
+		{
+		    handle_exit(clientSock);
+			break;
+		}
 
     }
     return 0;

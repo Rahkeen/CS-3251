@@ -58,7 +58,7 @@ int listDirectory(DirectoryInfo *dirInfo, char *dirName){
     LIST_INIT(&dirInfo->head);
     dirInfo->length = 0;
 
-    printf(dirName);
+    //printf("%s\n", dirName);
     d = opendir(dirName);
     chdir(dirName);
     if (d) {

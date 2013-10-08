@@ -8,9 +8,11 @@ int sendFile(int clientSocket, int serverSocket, FileInfo *fi) {
     stat(fi->name, &st);
     
     
-
-
-
+    
+    
+    
+    
+    
 }
 
 File * int pullFile(int serverSocket, FileInfo *fi) {

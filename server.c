@@ -35,6 +35,7 @@ int handle_list(int clientSock){
 
 int handle_diff(int clientSock){
     sendDirectoryInfo(clientSock);
+    return 0;
 }
 
 int handle_pull(int clientSock){

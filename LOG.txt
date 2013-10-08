@@ -1,2 +1,4 @@
 SERVER LOGS
 Sending Files to: 127.0.0.1
+Sending Diff to: 127.0.0.1
+Sending Files to: 127.0.0.1

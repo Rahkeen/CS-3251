@@ -24,6 +24,8 @@ void sendDirectoryInfo(int clientSock) {
     LIST_FOREACH(file, &(dInfo.head), FileInfoEntry){
         send(clientSock, file, sizeof(FileInfo), 0);
     }
+    
+    freeDirectoryInfo(&dInfo);
 }
 
 
@@ -41,6 +43,19 @@ int handle_diff(int clientSock, struct sockaddr_in clientAddr){
 }
 
 int handle_pull(int clientSock){
+    DirectoryInfo *diffDir;
+    FileInfo *file;
+    
+    sendDirectoryInfo(clientSock);
+    diffDir = recvDirectoryInfo(clientSock);
+    
+    chdir(SERVER_DIR);
+    LIST_FOREACH(file, &(diffDir->head), FileInfoEntry){
+        sendFile(clientSock, SERVER_DIR, file);
+    }
+    
+    freeDirectoryInfo(diffDir);
+	free(diffDir);
     return 0;
 }
 
@@ -73,6 +88,7 @@ void *handleClient(SockAndAddr *sa) {
                 handle_diff(clientSock, clientAddr);
                 break;
             case 'P':
+                printf("yo bitche\n");
                 handle_pull(clientSock);
                 break;
             case 'E':

@@ -1,10 +1,7 @@
 #pragma once
 #include "listdir.h"
+#include <sys/stat.h>
+#include "sync.h"
 
-struct File {
-    FileInfo info;
-    char *contents;
-    int size;
-}
-
-typedef struct File File;
+void recvFile(int socket, char *directory);
+void sendFile(int socket, char *directory, FileInfo *file);

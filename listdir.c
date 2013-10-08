@@ -16,6 +16,7 @@ By Stephen Pardue - 10/4/2013
 #include <string.h>
 
 
+
 FileInfo * getFileInfo(char * name) {
     FILE *fp;
     FileInfo *fi;
@@ -144,6 +145,28 @@ void printDirectoryInfo(DirectoryInfo *di){
 }
 
 
+DirectoryInfo *recvDirectoryInfo(int clientSock){
+    int i;
+	int len;
+	DirectoryInfo *recDir = calloc(1, sizeof(DirectoryInfo));
+	FileInfo *liBuff;
+	
+	memset(&len, 0, sizeof(len));
+	//recv the length
+	recv(clientSock, &len, sizeof(int), 0);
+	
+	recDir->length = len;
+	
+	//recv the list
+	for (i = 0; i < len; i++) {
+	    liBuff = calloc(1, sizeof(FileInfo));
+	    recv(clientSock, liBuff, sizeof(FileInfo), 0);
+	    LIST_INSERT_HEAD(&recDir->head, liBuff, FileInfoEntry);
+	    //printf("%s, %s\n", liBuff.name, liBuff.checksum);
+	}
+	
+	return recDir;
+}
 
 /*
 int main() {

@@ -18,9 +18,9 @@ ifeq ($(OS), SunOS)
 all: client server 
 
 client: client.c
-	$(CC) listdir.c listdir.h sync.h client.c -o client -lcrypto -lssl
+	$(CC) listdir.c listdir.h sync.h netfileio.c netfileio.h client.c -o client -lcrypto -lssl
 server: server.c
-	$(CC) -pthread sync.h listdir.c listdir.h server.c -o server -lcrypto -lssl 
+	$(CC) -pthread sync.h listdir.c listdir.h netfileio.c netfileio.h server.c -o server -lcrypto -lssl 
 
 clean:
 	    rm -f client server *.o

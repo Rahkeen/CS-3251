@@ -6,6 +6,9 @@ void recvFile(int socket, char *directory){
     FILE *file;
     FileInfo f;
     int size = 0;
+    int total;
+    int got = 0;
+    int toWrite;
     char *buff;
     
     chdir(directory);
@@ -17,27 +20,49 @@ void recvFile(int socket, char *directory){
         fprintf(stderr, "Error recieving the size of the file in recvFile\n");
         exit(-1);
     }
-    buff = calloc(size, sizeof(char));
+    fprintf("size: \n", size);
+ 
+    buff = malloc(RCVBUFSIZE*sizeof(char));
     if (buff == NULL){
         fprintf(stderr, "Error allocating memory for the file in recvFile\n");
         exit(-1);
     }
-    
-    if (recv(socket, buff, size*sizeof(char), 0) < 0){
-        fprintf(stderr, "Error recieving the file in recvFile\n");
-        exit(-1);
-    }
-    
-    file = fopen(f.name, "w");
+    file = fopen(f.name, "wb");
+    printf("f.name: %s\n", f.name);
     if (file == NULL){
         fprintf(stderr, "could not open the file for writing... in recvFile\n");
         exit(-1);
     }
+    total = size;
+    printf("total : %d\n", total);
+    while (total > 0) {
+        memset(buff, 0, RCVBUFSIZE);
+        
+        if (total < RCVBUFSIZE) {
+            toWrite = total;
+        } else {
+            toWrite = RCVBUFSIZE;
+        }
+        total-=toWrite;
+        //printf("To write: %d\n", toWrite);
+        
+        
+        int read;
+        if ((read = recv(socket, buff, toWrite*sizeof(char), 0)) < 0){
+            fprintf(stderr, "Error recieving the file in recvFile\n");
+            exit(-1);
+        }
+        //printf("read %d, toWrite %d\n", read, toWrite);
+        if (fwrite(buff, sizeof(char), toWrite, file) != sizeof(char)*toWrite){
+            fprintf(stderr, "error writing to file in recvFile\n");
+            exit(-1);
+        }
+        got+=RCVBUFSIZE;
+     }
+     
+     printf("bye...\n");
+        
     
-    if (fwrite(buff, sizeof(char), size, file) != sizeof(char)*size){
-        fprintf(stderr, "error writing to file in recvFile\n");
-        exit(-1);
-    }
     
     fclose(file);
     free(buff);
@@ -50,33 +75,54 @@ void sendFile(int socket, char *directory, FileInfo *file) {
     struct stat st;
     FILE * f;
     char * buff;
+    
+    int size = 0;
+    int total;
+    int sent = 0;
+    int toRead;
         
     stat(file->name, &st);
+    size = st.st_size;
     send(socket, file, sizeof(FileInfo), 0);
     
     //send the size
     send(socket, &st.st_size, sizeof(int), 0);
     
     
-    buff = calloc(st.st_size, sizeof(char));
-    if (! buff) {
-        fprintf(stderr, "memory allocation error in sendFile\n");
-        exit(1);
+    buff = malloc(RCVBUFSIZE*sizeof(char));
+    if (buff == NULL){
+        fprintf(stderr, "Error allocating memory for the file in recvFile\n");
+        exit(-1);
     }
     
-    f = fopen(file->name, "r");
+    f = fopen(file->name, "rb");
     if (f == NULL){
         fprintf(stderr, "error opening the file for reading in sendFile\n");
         exit(1);
     }
-    if (fread(buff, sizeof(char), st.st_size, f) != sizeof(char)*st.st_size){
-        fprintf(stderr, "error reading the file in sendFile\n");
-        exit(1);
-    }
-    
-    if (send(socket, buff, sizeof(char)*st.st_size, 0) != sizeof(char)*st.st_size){
-        fprintf(stderr, "error sending the buff in sendFile\n");
-        exit(1);
+    total = size;
+    while (total > 0) {
+        //printf("total: %d\n", total);
+        memset(buff, 0, RCVBUFSIZE);
+        
+        if (total < RCVBUFSIZE) {
+            toRead = total;
+        } else {
+            toRead = RCVBUFSIZE;
+        }
+        total-=toRead;
+        //printf("toRead: %d\n", toRead);
+        
+        if (fread(buff, sizeof(char), toRead, f) != sizeof(char)*toRead){
+            fprintf(stderr, "error reading the file in sendFile\n");
+            exit(1);
+        }
+        
+        
+        if (send(socket, buff, sizeof(char)*toRead, 0) != sizeof(char)*toRead){
+            fprintf(stderr, "error sending the buff in sendFile\n");
+            exit(1);
+        }
     }
     
     fclose(f);

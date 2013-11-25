@@ -76,17 +76,29 @@ void sendFile(int socket, char *directory, FileInfo *file) {
     FILE * f;
     char * buff;
     
-    int size = 0;
     int total;
     int sent = 0;
     int toRead;
-        
+    int i;
+    
+    printf("HI: %s\n", file->name);    
     stat(file->name, &st);
-    size = st.st_size;
-    send(socket, file, sizeof(FileInfo), 0);
+
+    
+    char buff2 = 'a';
+    
+    for (i = 0; i < 255; i++){
+        send(socket, &(file->name[i]), 1, 0);
+    }
+    
+    //send(socket, file, sizeof(FileInfo), 0);
     
     //send the size
-    send(socket, &st.st_size, sizeof(int), 0);
+    int32_t size = st.st_size;
+    printf("name: %s, size: %d\n", file->name, size);
+    //size = htonl(size);
+    printf("name: %s, size: %d\n", file->name, size);
+    send(socket, &st.st_size, sizeof(int32_t), 0);
     
     
     buff = malloc(RCVBUFSIZE*sizeof(char));

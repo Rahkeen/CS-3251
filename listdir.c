@@ -143,20 +143,43 @@ void printDirectoryInfo(DirectoryInfo *di){
 
 DirectoryInfo *recvDirectoryInfo(int clientSock){
     int i;
-	int len;
+    int j;
+	char len;
 	DirectoryInfo *recDir = calloc(1, sizeof(DirectoryInfo));
 	FileInfo *liBuff;
 	
-	memset(&len, 0, sizeof(len));
+	memset(&len, 0, sizeof(char));
 	//recv the length
-	recv(clientSock, &len, sizeof(int), 0);
+	recv(clientSock, &len, sizeof(char), 0);
 	
+	printf("len: %d\n", len);
 	recDir->length = len;
-	
+	char buff;
 	//recv the list
 	for (i = 0; i < len; i++) {
 	    liBuff = calloc(1, sizeof(FileInfo));
-	    recv(clientSock, liBuff, sizeof(FileInfo), 0);
+	    //recv(clientSock, &buff, 1, 0);
+	    //printf("%c\n", buff);
+	    
+	    for (j = 0; j < 255; j++){
+	        recv(clientSock, &buff, 1, 0); 
+	        liBuff->name[j] = buff;
+	    }
+	    
+	    //recv(clientSock, liBuff->name, 255, 0);
+	    
+	    for (j = 0; j < 16; j++){
+	        recv(clientSock, &buff, 1, 0); 
+	        liBuff->checksum[j] = buff;
+	    }
+	    
+	    //recv(clientSock, liBuff->checksum, 16, 0);
+	    
+	    
+	    
+	    //recv(clientSock, liBuff->checksum, 14, 0);
+	    
+	    printf("Name: %s\n", liBuff->name);
 	    LIST_INSERT_HEAD(&recDir->head, liBuff, FileInfoEntry);
 	    //printf("%s, %s\n", liBuff.name, liBuff.checksum);
 	}

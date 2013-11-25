@@ -35,8 +35,8 @@ int handle_list(int clientSock){
 	
 	DirectoryInfo *dInfo = recvDirectoryInfo(clientSock);
 	printf("List of files on Server: \n");
-	printDirectoryInfo(dInfo);
-	freeDirectoryInfo(dInfo);
+    printDirectoryInfo(dInfo);
+    freeDirectoryInfo(dInfo);
 	free(dInfo);
 }
 
@@ -63,6 +63,7 @@ int handle_pull(int clientSock){
         for (i = 0; i < diffDir->length; i++){
             recvFile(clientSock, CLIENT_DIR);
         }
+        
      } else {
         printf("No files to sync!\n");
      }
